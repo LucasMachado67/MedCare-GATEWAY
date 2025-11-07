@@ -1,0 +1,135 @@
+server:
+  port: 8084
+
+api:
+  security:
+    token:
+       secret: 'c8d1e3f7g9h2j4k6l8m0n5p9q7r5s3t1u0v8w6x4y2z0a1b3c5d7e9f'
+
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+        # Ativar descoberta via Eureka
+          # discovery:
+          #   locator:
+          #     enabled: true
+          #     lower-case-service-id: true
+        # ───────────────────────────────
+        # ENTITY SERVICE (MEDIC)
+        # ───────────────────────────────
+          routes:
+            - id: ms-perfil-medic
+              uri: http://localhost:8080/
+              predicates:
+                Path=/medic/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: entityServiceCircuit
+                    fallbackUri: forward:/fallback/entity
+
+        # ───────────────────────────────
+        # ENTITY SERVICE (PATIENT)
+        # ───────────────────────────────
+            - id: ms-perfil-patient
+              uri: http://localhost:8080
+              predicates:
+                Path=/patient/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: entityServiceCircuit
+                    fallbackUri: forward:/fallback/entity
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10   # 10 req/s
+                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+        # ───────────────────────────────
+        # ENTITY SERVICE (PERSON)
+        # ───────────────────────────────
+            - id: ms-perfil-person
+              uri: http://localhost:8080
+              predicates:
+                Path=/person/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: entityServiceCircuit
+                    fallbackUri: forward:/fallback/entity
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10   # 10 req/s
+                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+        # ───────────────────────────────
+        # ENTITY SERVICE (ADDRESS)
+        # ───────────────────────────────
+            - id: ms-perfil-address
+              uri: http://localhost:8080
+              predicates:
+                Path=/address/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: entityServiceCircuit
+                    fallbackUri: forward:/fallback/entity
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10   # 10 req/s
+                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+        # ───────────────────────────────
+        # APPOINTMENT SERVICE (SCHEDULE)
+        # ───────────────────────────────
+            - id: ms-appointment-schedule
+              uri: http://localhost:8082
+              predicates:
+                Path=/schedules/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: appointmentServiceCircuit
+                    fallbackUri: forward:/fallback/appointments
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10   # 10 req/s
+                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+        # ───────────────────────────────
+        # APPOINTMENT SERVICE (APPOINTMENT)
+        # ───────────────────────────────
+            - id: ms-appointment-appointments
+              uri: http://localhost:8082
+              predicates:
+                Path=/appointments/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: appointmentServiceCircuit
+                    fallbackUri: forward:/fallback/appointments
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10   # 10 req/s
+                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+        # ───────────────────────────────
+        # AUTH SERVICE (AUTH)
+        # ───────────────────────────────
+            - id: ms-user-auth
+              uri: http://localhost:8081
+              predicates:
+                Path=/auth/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: userServiceCircuit
+                    fallbackUri: forward:/fallback/auth
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG
+        security: DEBUG
