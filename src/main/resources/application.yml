@@ -14,17 +14,23 @@ spring:
     gateway:
       server:
         webflux:
-        # Ativar descoberta via Eureka
-          # discovery:
-          #   locator:
-          #     enabled: true
-          #     lower-case-service-id: true
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowed-origin-patterns: "*"
+                allowed-headers: "*"
+                allowed-methods: "*"
+                allow-credentials: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      
         # ───────────────────────────────
         # ENTITY SERVICE (MEDIC)
         # ───────────────────────────────
-          routes:
+      routes:
             - id: ms-perfil-medic
-              uri: http://localhost:8080/
+              uri: http://localhost:8080
               predicates:
                 Path=/medic/**
               filters:
@@ -45,10 +51,7 @@ spring:
                   args:
                     name: entityServiceCircuit
                     fallbackUri: forward:/fallback/entity
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10   # 10 req/s
-                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+
         # ───────────────────────────────
         # ENTITY SERVICE (PERSON)
         # ───────────────────────────────
@@ -61,10 +64,7 @@ spring:
                   args:
                     name: entityServiceCircuit
                     fallbackUri: forward:/fallback/entity
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10   # 10 req/s
-                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+
         # ───────────────────────────────
         # ENTITY SERVICE (ADDRESS)
         # ───────────────────────────────
@@ -77,10 +77,7 @@ spring:
                   args:
                     name: entityServiceCircuit
                     fallbackUri: forward:/fallback/entity
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10   # 10 req/s
-                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+
         # ───────────────────────────────
         # APPOINTMENT SERVICE (SCHEDULE)
         # ───────────────────────────────
@@ -93,10 +90,7 @@ spring:
                   args:
                     name: appointmentServiceCircuit
                     fallbackUri: forward:/fallback/appointments
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10   # 10 req/s
-                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+
         # ───────────────────────────────
         # APPOINTMENT SERVICE (APPOINTMENT)
         # ───────────────────────────────
@@ -109,10 +103,7 @@ spring:
                   args:
                     name: appointmentServiceCircuit
                     fallbackUri: forward:/fallback/appointments
-                - name: RequestRateLimiter
-                  args:
-                    redis-rate-limiter.replenishRate: 10   # 10 req/s
-                    redis-rate-limiter.burstCapacity: 20   # até 20 de uma vez
+
         # ───────────────────────────────
         # AUTH SERVICE (AUTH)
         # ───────────────────────────────

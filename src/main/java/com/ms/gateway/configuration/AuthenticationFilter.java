@@ -49,7 +49,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/validate",
             "/auth/all",
             "/medic",
-            "/patient",
+            "/patient/create",
             "/person/create"
     );
     /**
