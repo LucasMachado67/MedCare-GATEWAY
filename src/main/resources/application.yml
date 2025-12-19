@@ -33,11 +33,11 @@ spring:
               uri: http://localhost:8080
               predicates:
                 Path=/medic/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: entityServiceCircuit
-                    fallbackUri: forward:/fallback/entity
+              # filters:
+              #   - name: CircuitBreaker
+              #     args:
+              #       name: entityServiceCircuit
+              #       fallbackUri: forward:/fallback/entity
 
         # ───────────────────────────────
         # ENTITY SERVICE (PATIENT)
