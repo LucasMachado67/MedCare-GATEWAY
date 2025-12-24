@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8085
 
 api:
   security:
@@ -30,7 +30,7 @@ spring:
         # ───────────────────────────────
       routes:
             - id: ms-perfil-medic
-              uri: http://localhost:8080
+              uri: http://localhost:8082
               predicates:
                 Path=/medic/**
               # filters:
@@ -43,7 +43,7 @@ spring:
         # ENTITY SERVICE (PATIENT)
         # ───────────────────────────────
             - id: ms-perfil-patient
-              uri: http://localhost:8080
+              uri: http://localhost:8082
               predicates:
                 Path=/patient/**
               filters:
@@ -56,7 +56,7 @@ spring:
         # ENTITY SERVICE (PERSON)
         # ───────────────────────────────
             - id: ms-perfil-person
-              uri: http://localhost:8080
+              uri: http://localhost:8082
               predicates:
                 Path=/person/**
               filters:
@@ -69,7 +69,7 @@ spring:
         # ENTITY SERVICE (ADDRESS)
         # ───────────────────────────────
             - id: ms-perfil-address
-              uri: http://localhost:8080
+              uri: http://localhost:8082
               predicates:
                 Path=/address/**
               filters:
@@ -82,7 +82,7 @@ spring:
         # APPOINTMENT SERVICE (SCHEDULE)
         # ───────────────────────────────
             - id: ms-appointment-schedule
-              uri: http://localhost:8082
+              uri: http://localhost:8083
               predicates:
                 Path=/schedules/**
               filters:
@@ -95,7 +95,7 @@ spring:
         # APPOINTMENT SERVICE (APPOINTMENT)
         # ───────────────────────────────
             - id: ms-appointment-appointments
-              uri: http://localhost:8082
+              uri: http://localhost:8083
               predicates:
                 Path=/appointments/**
               filters:

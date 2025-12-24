@@ -50,7 +50,8 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/all",
             "/medic",
             "/patient/create",
-            "/person/create"
+            "/person/create",
+            "/patient"
     );
     /**
      * Define a lógica de filtragem para cada requisição.
