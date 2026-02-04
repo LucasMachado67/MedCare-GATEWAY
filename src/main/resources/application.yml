@@ -8,8 +8,7 @@ api:
 
 spring:
   application:
-    name: gateway
-
+    name: "gateway"
   cloud:
     gateway:
       server:
@@ -18,17 +17,14 @@ spring:
             add-to-simple-url-handler-mapping: true
             cors-configurations:
               '[/**]':
-                allowed-origin-patterns: "*"
-                allowed-headers: "*"
-                allowed-methods: "*"
-                allow-credentials: true
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-      
-        # ───────────────────────────────
-        # ENTITY SERVICE (MEDIC)
-        # ───────────────────────────────
-      routes:
+                allowedOrigins: "http://localhost:4200"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: true
+          # ───────────────────────────────
+          # ENTITY SERVICE (MEDIC)
+          # ───────────────────────────────
+          routes:
             - id: ms-perfil-medic
               uri: http://localhost:8082
               predicates:
@@ -39,9 +35,9 @@ spring:
               #       name: entityServiceCircuit
               #       fallbackUri: forward:/fallback/entity
 
-        # ───────────────────────────────
-        # ENTITY SERVICE (PATIENT)
-        # ───────────────────────────────
+            # ───────────────────────────────
+            # ENTITY SERVICE (PATIENT)
+            # ───────────────────────────────
             - id: ms-perfil-patient
               uri: http://localhost:8082
               predicates:
@@ -51,10 +47,22 @@ spring:
                   args:
                     name: entityServiceCircuit
                     fallbackUri: forward:/fallback/entity
+            # ───────────────────────────────
+            # ENTITY SERVICE (ASSISTANT)
+            # ───────────────────────────────
+            - id: ms-perfil-assistant
+              uri: http://localhost:8082
+              predicates:
+                Path=/assistant/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: entityServiceCircuit
+                    fallbackUri: forward:/fallback/entity
 
-        # ───────────────────────────────
-        # ENTITY SERVICE (PERSON)
-        # ───────────────────────────────
+            # ───────────────────────────────
+            # ENTITY SERVICE (PERSON)
+            # ───────────────────────────────
             - id: ms-perfil-person
               uri: http://localhost:8082
               predicates:
@@ -65,9 +73,9 @@ spring:
                     name: entityServiceCircuit
                     fallbackUri: forward:/fallback/entity
 
-        # ───────────────────────────────
-        # ENTITY SERVICE (ADDRESS)
-        # ───────────────────────────────
+            # ───────────────────────────────
+            # ENTITY SERVICE (ADDRESS)
+            # ───────────────────────────────
             - id: ms-perfil-address
               uri: http://localhost:8082
               predicates:
@@ -78,9 +86,9 @@ spring:
                     name: entityServiceCircuit
                     fallbackUri: forward:/fallback/entity
 
-        # ───────────────────────────────
-        # APPOINTMENT SERVICE (SCHEDULE)
-        # ───────────────────────────────
+            # ───────────────────────────────
+            # APPOINTMENT SERVICE (SCHEDULE)
+            # ───────────────────────────────
             - id: ms-appointment-schedule
               uri: http://localhost:8083
               predicates:
@@ -91,9 +99,9 @@ spring:
                     name: appointmentServiceCircuit
                     fallbackUri: forward:/fallback/appointments
 
-        # ───────────────────────────────
-        # APPOINTMENT SERVICE (APPOINTMENT)
-        # ───────────────────────────────
+            # ───────────────────────────────
+            # APPOINTMENT SERVICE (APPOINTMENT)
+            # ───────────────────────────────
             - id: ms-appointment-appointments
               uri: http://localhost:8083
               predicates:
@@ -104,18 +112,18 @@ spring:
                     name: appointmentServiceCircuit
                     fallbackUri: forward:/fallback/appointments
 
-        # ───────────────────────────────
-        # AUTH SERVICE (AUTH)
-        # ───────────────────────────────
+            # ───────────────────────────────
+            # AUTH SERVICE (AUTH)
+            # ───────────────────────────────
             - id: ms-user-auth
               uri: http://localhost:8081
               predicates:
                 Path=/auth/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: userServiceCircuit
-                    fallbackUri: forward:/fallback/auth
+    #            filters:
+    #              - name: CircuitBreaker
+    #                args:
+    #                  name: userServiceCircuit
+    #                  fallbackUri: forward:/fallback/auth
 
 logging:
   level:
