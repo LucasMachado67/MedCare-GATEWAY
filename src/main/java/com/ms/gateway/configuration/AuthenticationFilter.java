@@ -3,6 +3,7 @@ package com.ms.gateway.configuration;
 import java.util.List;
 import java.util.function.Predicate;
 
+import io.jsonwebtoken.io.Decoders;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -43,10 +44,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
      Qualquer rota que comece com um desses prefixos será liberada imediatamente para ser roteada ao microservice.
     */
     public static final List<String> openEndpoints = List.of(
-            "/auth/login",
-            "/auth/signup",
-            "/auth/validate",
-            "/auth/all"
+            "/api/auth/login",
+            "/api/auth/signup",
+            "/api/auth/validate",
+            "/api/auth/all"
 //            "/medic",
 //            "/patient/create",
 //            "/person/create",
@@ -93,21 +94,38 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         try {
             // Tenta validar o 'token'. Se falhar, uma exceção é lançada.
             Claims claims = getClaimsFromToken(token);
+            //Validação se é o primeiro acesso do user no sistema
             Boolean mustChange = claims.get("mustChangePassword", Boolean.class);
 
-            // Adicione este log para sabermos exatamente o que o Gateway está lendo
-            System.out.println("Path atual: " + path + " | MustChange: " + mustChange);
-
-            // Melhore a condição: Se for update-password, SEMPRE deixa passar
+            //Se for update-password, SEMPRE deixa passar
             boolean isUpdatePasswordPath = path.contains("update-password");
 
             if (mustChange != null && mustChange && !isUpdatePasswordPath) {
                 System.out.println("Bloqueio de segurança: Redirecionando para troca de senha.");
                 return this.onError(exchange, "PASSWORD_CHANGE_REQUIRED");
             }
+
+            //Validações do tenant
+            String tenantIdFromToken = claims.get("tenant_id", String.class);
+            // Extrair o tenant da URL (o primeiro segmento após a barra)
+            // Ex path: /clinica-sorriso/patient/1 -> partes[1] é "clinica-sorriso"
+            // não validar tenant para rotas de auth
+            if (!path.startsWith("/auth")) {
+
+                String[] pathSegments = path.split("/");
+
+                if (pathSegments.length > 1) {
+                    String tenantFromUrl = pathSegments[1];
+
+                    if (!tenantIdFromToken.equals(tenantFromUrl)) {
+                        return this.onError(exchange, "Acesso negado: Tenant inválido.");
+                    }
+                }
+            }
             // Isso evita que o microservice precise decodificar o 'token' novamente.
             exchange.getRequest().mutate()
                     .header("X-User-Id", claims.getSubject()) // Adiciona o Subject (geralmente o ID do usuário)
+                    .header("X-Tenant-Id", tenantIdFromToken)
                     .build();
 
         } catch (Exception e) {
@@ -116,7 +134,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         }
 
         // 4. Se chegou até aqui, o token é válido. Prosseguir.
-        System.out.println("Chegou no token");
         return chain.filter(exchange);
     }
 
@@ -145,7 +162,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         try {
         // Especificar o Charset (StandardCharsets.UTF_8)
         // Tenta criar a chave HMAC a partir dos bytes da sua string secreta (UTF-8)
-        java.security.Key signingKey = Keys.hmacShaKeyFor(secret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        java.security.Key signingKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         return Jwts.parserBuilder()
                 .setSigningKey(signingKey) // Mudar aqui
                 .build()

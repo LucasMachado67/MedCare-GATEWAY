@@ -28,8 +28,11 @@ spring:
             - id: ms-perfil-medic
               uri: http://localhost:8082
               predicates:
-                Path=/medic/**
-              # filters:
+                # Captura /{tenant}/medic e o que vier depois
+                - Path=/{tenant}/medic/**
+              filters:
+                # O RewritePath remove o UUID da URL para o microservice não dar 404
+                - RewritePath=/(?<tenant>.*)/medic/(?<remaining>.*), /medic/${remaining}
               #   - name: CircuitBreaker
               #     args:
               #       name: entityServiceCircuit
@@ -41,24 +44,28 @@ spring:
             - id: ms-perfil-patient
               uri: http://localhost:8082
               predicates:
-                Path=/patient/**
+                # Captura /{tenant}/patient e o que vier depois
+                - Path=/{tenant}/patient/**
               filters:
-                - name: CircuitBreaker
-                  args:
-                    name: entityServiceCircuit
-                    fallbackUri: forward:/fallback/entity
+                - RewritePath=/(?<tenant>.*)/patient/(?<remaining>.*), /patient/${remaining}
+#                - name: CircuitBreaker
+#                  args:
+#                    name: entityServiceCircuit
+#                    fallbackUri: forward:/fallback/entity
             # ───────────────────────────────
             # ENTITY SERVICE (ASSISTANT)
             # ───────────────────────────────
             - id: ms-perfil-assistant
               uri: http://localhost:8082
               predicates:
-                Path=/assistant/**
+                # Captura /{tenant}/assistant e o que vier depois
+                - Path=/{tenant}/assistant/**
               filters:
-                - name: CircuitBreaker
-                  args:
-                    name: entityServiceCircuit
-                    fallbackUri: forward:/fallback/entity
+                - RewritePath=/(?<tenant>.*)/assistant/(?<remaining>.*), /assistant/${remaining}
+#                - name: CircuitBreaker
+#                  args:
+#                    name: entityServiceCircuit
+#                    fallbackUri: forward:/fallback/entity
 
             # ───────────────────────────────
             # ENTITY SERVICE (PERSON)
@@ -66,51 +73,44 @@ spring:
             - id: ms-perfil-person
               uri: http://localhost:8082
               predicates:
-                Path=/person/**
+                # Captura /{tenant}/person e o que vier depois
+                - Path=/{tenant}/person/**
               filters:
-                - name: CircuitBreaker
-                  args:
-                    name: entityServiceCircuit
-                    fallbackUri: forward:/fallback/entity
-
-            # ───────────────────────────────
-            # ENTITY SERVICE (ADDRESS)
-            # ───────────────────────────────
-            - id: ms-perfil-address
-              uri: http://localhost:8082
-              predicates:
-                Path=/address/**
-              filters:
-                - name: CircuitBreaker
-                  args:
-                    name: entityServiceCircuit
-                    fallbackUri: forward:/fallback/entity
+                - RewritePath=/(?<tenant>.*)/person/(?<remaining>.*), /person/${remaining}
+#                - name: CircuitBreaker
+#                  args:
+#                    name: entityServiceCircuit
+#                    fallbackUri: forward:/fallback/entity
 
             # ───────────────────────────────
             # APPOINTMENT SERVICE (SCHEDULE)
             # ───────────────────────────────
             - id: ms-appointment-schedule
-              uri: http://localhost:8083
+              uri: http://localhost:8084
               predicates:
-                Path=/schedules/**
+                # Captura /{tenant}/schedule e o que vier depois
+                - Path=/{tenant}/schedule/**
               filters:
-                - name: CircuitBreaker
-                  args:
-                    name: appointmentServiceCircuit
-                    fallbackUri: forward:/fallback/appointments
+                - RewritePath=/(?<tenant>.*)/schedule/(?<remaining>.*), /schedule/${remaining}
+#                - name: CircuitBreaker
+#                  args:
+#                    name: appointmentServiceCircuit
+#                    fallbackUri: forward:/fallback/appointments
 
             # ───────────────────────────────
             # APPOINTMENT SERVICE (APPOINTMENT)
             # ───────────────────────────────
             - id: ms-appointment-appointments
-              uri: http://localhost:8083
+              uri: http://localhost:8084
               predicates:
-                Path=/appointments/**
+                # Captura /{tenant}/appointment e o que vier depois
+                - Path=/{tenant}/appointment/**
               filters:
-                - name: CircuitBreaker
-                  args:
-                    name: appointmentServiceCircuit
-                    fallbackUri: forward:/fallback/appointments
+                - RewritePath=/(?<tenant>.*)/appointment/(?<remaining>.*), /appointment/${remaining}
+#                - name: CircuitBreaker
+#                  args:
+#                    name: appointmentServiceCircuit
+#                    fallbackUri: forward:/fallback/appointments
 
             # ───────────────────────────────
             # AUTH SERVICE (AUTH)
@@ -119,12 +119,23 @@ spring:
               uri: http://localhost:8081
               predicates:
                 Path=/auth/**
-    #            filters:
-    #              - name: CircuitBreaker
-    #                args:
-    #                  name: userServiceCircuit
-    #                  fallbackUri: forward:/fallback/auth
-
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: userServiceCircuit
+                    fallbackUri: forward:/fallback/auth c
+            # ───────────────────────────────
+            # AUTH SERVICE (COMPANY)
+            # ───────────────────────────────
+            - id: ms-company-auth
+              uri: http://localhost:8081
+              predicates:
+                Path=/company/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: userServiceCircuit
+                    fallbackUri: forward:/fallback/auth
 logging:
   level:
     org:
