@@ -44,10 +44,11 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
      Qualquer rota que comece com um desses prefixos será liberada imediatamente para ser roteada ao microservice.
     */
     public static final List<String> openEndpoints = List.of(
-            "/api/auth/login",
-            "/api/auth/signup",
-            "/api/auth/validate",
-            "/api/auth/all"
+            "/auth/login",
+            "/auth/signup",
+            "/auth/validate",
+            "/auth/all",
+            "/company/"
 //            "/medic",
 //            "/patient/create",
 //            "/person/create",
