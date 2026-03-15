@@ -32,6 +32,8 @@ spring:
                 - Path=/{tenant}/medic/**
               filters:
                 # O RewritePath remove o UUID da URL para o microservice não dar 404
+                #- RewritePath=/(?<tenant>.*)/medic/(?<remaining>.*), /medic/${remaining}
+                - AddRequestHeader=X-Tenant, {tenant}
                 - RewritePath=/(?<tenant>.*)/medic/(?<remaining>.*), /medic/${remaining}
               #   - name: CircuitBreaker
               #     args:
