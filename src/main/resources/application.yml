@@ -49,6 +49,8 @@ spring:
                 # Captura /{tenant}/patient e o que vier depois
                 - Path=/{tenant}/patient/**
               filters:
+                # O RewritePath remove o UUID da URL para o microservice não dar 404
+                - AddRequestHeader=X-Tenant, {tenant}
                 - RewritePath=/(?<tenant>.*)/patient/(?<remaining>.*), /patient/${remaining}
 #                - name: CircuitBreaker
 #                  args:
@@ -63,6 +65,9 @@ spring:
                 # Captura /{tenant}/assistant e o que vier depois
                 - Path=/{tenant}/assistant/**
               filters:
+                # O RewritePath remove o UUID da URL para o microservice não dar 404
+                #- RewritePath=/(?<tenant>.*)/assistant/(?<remaining>.*), /assistant/${remaining}
+                - AddRequestHeader=X-Tenant, {tenant}
                 - RewritePath=/(?<tenant>.*)/assistant/(?<remaining>.*), /assistant/${remaining}
 #                - name: CircuitBreaker
 #                  args:
@@ -78,6 +83,9 @@ spring:
                 # Captura /{tenant}/person e o que vier depois
                 - Path=/{tenant}/person/**
               filters:
+                # O RewritePath remove o UUID da URL para o microservice não dar 404
+                #- RewritePath=/(?<tenant>.*)/person/(?<remaining>.*), /person/${remaining}
+                - AddRequestHeader=X-Tenant, {tenant}
                 - RewritePath=/(?<tenant>.*)/person/(?<remaining>.*), /person/${remaining}
 #                - name: CircuitBreaker
 #                  args:

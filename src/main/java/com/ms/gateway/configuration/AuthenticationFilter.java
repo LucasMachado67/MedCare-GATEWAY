@@ -48,10 +48,9 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             "/auth/signup",
             "/auth/validate",
             "/auth/all",
-            "/company/"
+            "/company/",
 //            "/medic",
-//            "/patient/create",
-//            "/person/create",
+            "/patient/create"
 //            "/patient"
     );
     /**
@@ -65,7 +64,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         // 1. Verificar Rotas Abertas
         // Cria um Predicate para checar se o caminho da requisição começa com algum dos endpoints abertos.
         Predicate<String> isPathOpen = p -> openEndpoints.stream()
-                .anyMatch(path::startsWith);
+                .anyMatch(path::contains);
 
         if (isPathOpen.test(path)) {
             System.out.println("Rota aberta: " + path + ". Prosseguindo sem validação de token.");
@@ -107,7 +106,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             }
 
             //Validações do tenant
-            String tenantIdFromToken = claims.get("tenant_id", String.class);
+            String tenantIdFromToken = claims.get("tenantId", String.class);
             // Extrair o tenant da URL (o primeiro segmento após a barra)
             // Ex path: /clinica-sorriso/patient/1 -> partes[1] é "clinica-sorriso"
             // não validar tenant para rotas de auth
